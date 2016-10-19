@@ -27,6 +27,10 @@
 //
 #endregion
 
+using System.Dynamic;
+using System.Linq;
+using Newtonsoft.Json;
+
 namespace ChargifyNET
 {
     #region Imports
@@ -1727,7 +1731,7 @@ namespace ChargifyNET
                                       CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress,
                                       CreditCardAttributes.BillingCity, CreditCardAttributes.BillingState, CreditCardAttributes.BillingZip,
                                       CreditCardAttributes.BillingCountry, CouponCode);
-        }
+        } 
 
         /// <summary>
         /// Create a new subscription without requiring credit card information
@@ -1794,6 +1798,8 @@ namespace ChargifyNET
                                       CreditCardAttributes.BillingCity, CreditCardAttributes.BillingState, CreditCardAttributes.BillingZip,
                                       CreditCardAttributes.BillingCountry, CouponCode);
         }
+
+        
 
         /// <summary>
         /// Create a new subscription and a new customer at the same time without submitting PaymentProfile attributes
@@ -1903,6 +1909,98 @@ namespace ChargifyNET
                                       CreditCardAttributes.FirstName, CreditCardAttributes.LastName, CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
                                       CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress, CreditCardAttributes.BillingCity,
                                       CreditCardAttributes.BillingState, CreditCardAttributes.BillingZip, CreditCardAttributes.BillingCountry, string.Empty, ComponentsWithQuantity, null);
+        }
+
+        public ISubscription CreateSubscriptionUsingCoupon(string ProductHandle, ICustomerAttributes CustomerAttributes, ICreditCardAttributes CreditCardAttributes, DateTime? NextBillingAt, Dictionary<int, string> ComponentsWithQuantity, string CouponCode)
+        {
+            //if (CreditCardAttributes == null) throw new ArgumentNullException("CreditCardAttributes");
+            if (CustomerAttributes == null) throw new ArgumentNullException("CustomerAttributes");
+            //return CreateSubscription(ProductHandle, CustomerAttributes.SystemID, CustomerAttributes.FirstName,
+            //                          CustomerAttributes.LastName, CustomerAttributes.Email, CustomerAttributes.Phone, CustomerAttributes.Organization, CustomerAttributes.ShippingAddress, 
+            //                          CustomerAttributes.ShippingCity, CustomerAttributes.ShippingState, CustomerAttributes.ShippingZip, CustomerAttributes.ShippingCountry,
+            //                          CreditCardAttributes.FirstName, CreditCardAttributes.LastName, CreditCardAttributes.FullNumber, CreditCardAttributes.ExpirationMonth,
+            //                          CreditCardAttributes.ExpirationYear, CreditCardAttributes.CVV, CreditCardAttributes.BillingAddress, CreditCardAttributes.BillingCity,
+            //                          CreditCardAttributes.BillingState, CreditCardAttributes.BillingZip, CreditCardAttributes.BillingCountry, CouponCode ?? string.Empty, ComponentsWithQuantity, NextBillingAt); 
+
+
+            if (string.IsNullOrEmpty(ProductHandle)) throw new ArgumentNullException("ProductHandle");
+            var product = this.LoadProduct(ProductHandle);
+            if (product == null) throw new ArgumentException("The product doesn't exist", ProductHandle);
+            // if ((ComponentsWithQuantity.Count < 0)) throw new ArgumentNullException("ComponentsWithQuantity", "No components specified");
+
+            //if (string.IsNullOrEmpty(FirstName)) throw new ArgumentNullException("FirstName");
+            //if (string.IsNullOrEmpty(LastName)) throw new ArgumentNullException("LastName");
+            //if (string.IsNullOrEmpty(EmailAddress)) throw new ArgumentNullException("EmailAddress");
+            //if (string.IsNullOrEmpty(FullNumber)) throw new ArgumentNullException("FullNumber");
+            ////if (NewSystemID == string.Empty) throw new ArgumentNullException("NewSystemID");
+            //if ((ExpirationMonth <= 0) && (ExpirationMonth > 12)) throw new ArgumentException("Not within range", "ExpirationMonth");
+            //if (ExpirationYear < DateTime.Today.Year) throw new ArgumentException("Not within range", "ExpirationYear");
+            //if (this._cvvRequired && string.IsNullOrEmpty(CVV)) throw new ArgumentNullException("CVV");
+            //if (this._cvvRequired && ((CVV.Length < 3) || (CVV.Length > 4))) throw new ArgumentException("CVV must be 3 or 4 digits", "CVV");
+
+            //if (!string.IsNullOrEmpty(NewSystemID))
+            //{
+            //    // make sure that the system ID is unique
+            //    if (this.LoadCustomer(NewSystemID) != null) throw new ArgumentException("Not unique", "NewSystemID");
+            //}
+
+            // create XML for creation of customer
+            var subscriptionXml = new StringBuilder(GetXMLStringIfApplicable());
+            subscriptionXml.Append("<subscription>");
+            subscriptionXml.AppendFormat("<product_handle>{0}</product_handle>", ProductHandle);
+            subscriptionXml.Append("<customer_attributes>");
+            subscriptionXml.AppendFormat("<first_name>{0}</first_name>", CustomerAttributes.FirstName);
+            subscriptionXml.AppendFormat("<last_name>{0}</last_name>", CustomerAttributes.LastName);
+            subscriptionXml.AppendFormat("<email>{0}</email>", CustomerAttributes.Email);
+            if (!string.IsNullOrEmpty(CustomerAttributes.Cc_Emails)) subscriptionXml.AppendFormat("<cc_emails>{0}</cc_emails>", CustomerAttributes.Cc_Emails);
+            //if (!string.IsNullOrEmpty(Phone)) subscriptionXml.AppendFormat("<phone>{0}</phone>", Phone);
+            subscriptionXml.AppendFormat("<organization>{0}</organization>", (CustomerAttributes.Organization != null) ? HttpUtility.HtmlEncode(CustomerAttributes.Organization ) : "null");
+            subscriptionXml.AppendFormat("<reference>{0}</reference>", CustomerAttributes.SystemID.ToString());
+            //if (!string.IsNullOrEmpty(ShippingAddress)) subscriptionXml.AppendFormat("<address>{0}</address>", ShippingAddress);
+            //if (!string.IsNullOrEmpty(ShippingCity)) subscriptionXml.AppendFormat("<city>{0}</city>", ShippingCity);
+            //if (!string.IsNullOrEmpty(ShippingState)) subscriptionXml.AppendFormat("<state>{0}</state>", ShippingState);
+            //if (!string.IsNullOrEmpty(ShippingZip)) subscriptionXml.AppendFormat("<zip>{0}</zip>", ShippingZip);
+            //if (!string.IsNullOrEmpty(ShippingCountry)) subscriptionXml.AppendFormat("<country>{0}</country>", ShippingCountry);
+            subscriptionXml.Append("</customer_attributes>");
+            if (CreditCardAttributes != null)
+            {
+                subscriptionXml.Append("<credit_card_attributes>");
+                if (!string.IsNullOrWhiteSpace(CreditCardAttributes.FirstName)) subscriptionXml.AppendFormat("<first_name>{0}</first_name>", CreditCardAttributes.FirstName);
+                if (!string.IsNullOrWhiteSpace(CreditCardAttributes.LastName)) subscriptionXml.AppendFormat("<last_name>{0}</last_name>", CreditCardAttributes.LastName);
+                subscriptionXml.AppendFormat("<full_number>{0}</full_number>", CreditCardAttributes.FullNumber);
+                subscriptionXml.AppendFormat("<expiration_month>{0}</expiration_month>", CreditCardAttributes.ExpirationMonth);
+                subscriptionXml.AppendFormat("<expiration_year>{0}</expiration_year>", CreditCardAttributes.ExpirationYear);
+                if (!string.IsNullOrEmpty( CreditCardAttributes.CVV))
+                {
+                    subscriptionXml.AppendFormat("<cvv>{0}</cvv>", CreditCardAttributes.CVV);
+                }
+                //if (!string.IsNullOrEmpty(BillingAddress)) subscriptionXml.AppendFormat("<billing_address>{0}</billing_address>", BillingAddress);
+                //if (!string.IsNullOrEmpty(BillingCity)) subscriptionXml.AppendFormat("<billing_city>{0}</billing_city>", BillingCity);
+                //if (!string.IsNullOrEmpty(BillingState)) subscriptionXml.AppendFormat("<billing_state>{0}</billing_state>", BillingState);
+                //if (!string.IsNullOrEmpty(BillingZip)) subscriptionXml.AppendFormat("<billing_zip>{0}</billing_zip>", BillingZip);
+                //if (!string.IsNullOrEmpty(BillingCountry)) subscriptionXml.AppendFormat("<billing_country>{0}</billing_country>", BillingCountry);
+                subscriptionXml.Append("</credit_card_attributes>");
+            }
+            if (!string.IsNullOrEmpty(CouponCode)) { subscriptionXml.AppendFormat("<coupon_code>{0}</coupon_code>", CouponCode); }
+            if (NextBillingAt.HasValue) { subscriptionXml.AppendFormat("<next_billing_at>{0}</next_billing_at>", NextBillingAt.Value.ToString("o")); }
+            if (ComponentsWithQuantity != null && ComponentsWithQuantity.Count > 0)
+            {
+                subscriptionXml.Append(@"<components type=""array"">");
+                foreach (var item in ComponentsWithQuantity)
+                {
+                    subscriptionXml.Append("<component>");
+                    subscriptionXml.Append(string.Format("<component_id>{0}</component_id>", item.Key));
+                    subscriptionXml.Append(string.Format("<allocated_quantity>{0}</allocated_quantity>", item.Value));
+                    subscriptionXml.Append("</component>");
+                }
+                subscriptionXml.Append("</components>");
+            }
+            subscriptionXml.Append("</subscription>");
+            // now make the request
+            string response = this.DoRequest(string.Format("subscriptions.{0}", GetMethodExtension()), HttpRequestMethod.Post, subscriptionXml.ToString());
+            // change the response to the object
+            return response.ConvertResponseTo<Subscription>("subscription");
+
         }
 
         private ISubscription CreateSubscription(string ProductHandle, string NewSystemID, string FirstName, string LastName, string EmailAddress, string Phone,
@@ -4228,6 +4326,80 @@ namespace ChargifyNET
             return ComponentAllocationXML.ToString();
 
         }
+
+        public List<ComponentAllocation> CreateComponentAllocations(int subscriptionId, ComponentUpgradeProrationScheme upgradeScheme, ComponentDowngradeProrationScheme downgradeScheme, List<ComponentChange> componentChanges)
+        {
+           if (componentChanges == null || !componentChanges.Any()) throw new ArgumentNullException(nameof(componentChanges));
+
+            dynamic obj = new ExpandoObject();
+
+            if (upgradeScheme != ComponentUpgradeProrationScheme.Unknown)
+            {
+                switch (upgradeScheme)
+                {
+                    case ComponentUpgradeProrationScheme.No_Prorate:
+                        obj.proration_upgrade_scheme = "no-prorate";
+                        break;
+                    case ComponentUpgradeProrationScheme.Prorate_Attempt_Capture:
+                        obj.proration_upgrade_scheme = "prorate-attempt-capture";
+                        break;
+                    default:
+                        obj.proration_upgrade_scheme = upgradeScheme.ToString();
+                        break;
+                }
+            }
+
+            if (downgradeScheme != ComponentDowngradeProrationScheme.Unknown)
+            {
+                switch (downgradeScheme)
+                {
+                    case ComponentDowngradeProrationScheme.Prorate:
+                        obj.proration_downgrade_scheme = "prorate";
+                        break;
+                    case ComponentDowngradeProrationScheme.No_Prorate:
+                        obj.proration_downgrade_scheme = "no-prorate";
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            obj.allocations = new List<dynamic>();
+            foreach (var componentChange in componentChanges)
+            {
+                dynamic change = new ExpandoObject();
+                change.component_id = componentChange.ComponentId;
+                change.quantity = componentChange.Quantity;
+                change.memo = componentChange.Memo ?? string.Empty;
+                obj.allocations.Add(change);
+            }
+
+            var json = JsonConvert.SerializeObject(obj);
+
+            var rememberSetting = UseJSON;
+            UseJSON = true;
+            string response = DoRequest($"subscriptions/{subscriptionId}/allocations.json", HttpRequestMethod.Post, json);
+            UseJSON = rememberSetting;
+
+            return JsonConvert.DeserializeObject<List<ComponentAllocation>>(response);
+        }
+
+        public DateTime? LastPaymentFailureDate(int subscriptionId)
+        {
+            var useJson = UseJSON;
+            UseJSON = true;
+            var response = DoRequest($"subscriptions/{subscriptionId}/events.json?filter=payment_failure&page=1&per_page=1", HttpRequestMethod.Get, null);
+            UseJSON = useJson;
+
+            var responseObj = JsonConvert.DeserializeObject<List<dynamic>>(response);
+
+            if (responseObj != null && responseObj.Any())
+            {
+                return responseObj[0].@event.created_at;
+            }
+
+            return null;
+        }
         #endregion
 
         #region Transactions
@@ -5536,9 +5708,16 @@ namespace ChargifyNET
                 {
                     if (this.UseJSON == true)
                     {
-                        XmlDocument doc = new XmlDocument();
-                        doc.LoadXml(postData);
-                        dataToPost = XmlToJsonConverter.XmlToJSON(doc);
+                        try
+                        {
+                            XmlDocument doc = new XmlDocument();
+                            doc.LoadXml(postData);
+                            dataToPost = XmlToJsonConverter.XmlToJSON(doc);
+                        }
+                        catch (Exception)
+                        {
+                            //dataToPost should be json already and failed to parse in LoadXml
+                        }
                     }
 
                     // Wrap the request stream with a text-based writer

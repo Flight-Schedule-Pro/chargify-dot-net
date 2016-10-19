@@ -65,6 +65,7 @@
     <ApplicationIcon>wallet.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.8.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -92,6 +93,7 @@
     </Compile>
     <Compile Include="ComponentAllocation.cs" />
     <Compile Include="ComponentAttributes.cs" />
+    <Compile Include="ComponentChange.cs" />
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="Configuration\ChargifyAccountElement.cs" />
     <Compile Include="Configuration\ChargifyAccountElementCollection.cs" />

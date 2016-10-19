@@ -51,6 +51,8 @@ namespace ChargifyNET
         /// Get or set the customer's email address
         /// </summary>
         string Email { get; set; }
+
+        string Cc_Emails { get; set; }
         /// <summary>
         /// The customer's phone number
         /// </summary>

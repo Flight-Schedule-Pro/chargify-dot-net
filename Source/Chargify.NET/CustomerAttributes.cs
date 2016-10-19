@@ -309,6 +309,9 @@ namespace ChargifyNET
             return !string.IsNullOrEmpty(Email);
         }
 
+        [XmlElement("cc_emails")]
+        public string Cc_Emails { get; set; }
+        
         /// <summary>
         /// The customer's phone number
         /// </summary>
