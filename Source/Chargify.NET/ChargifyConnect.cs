@@ -3753,7 +3753,7 @@ namespace ChargifyNET
         /// <param name="delayCharge">(Optional) Should the charge be billed during the next assessment? Default = false</param>
         /// <param name="useNegativeBalance">(Optional) Should the subscription balance be taken into consideration? Default = true</param>
         /// <returns>The charge details</returns>
-        public ICharge CreateCharge(int SubscriptionID, decimal amount, string memo, bool useNegativeBalance = false, bool delayCharge = false)
+        public ICharge CreateCharge(int SubscriptionID, decimal amount, string memo, bool useNegativeBalance = false, bool delayCharge = false, bool accrueOnFailure = false)
         {
             // make sure data is valid
             if (amount < 0) throw new ArgumentNullException("Amount"); // Chargify will throw a 422 if a negative number is in this field.
@@ -3767,6 +3767,7 @@ namespace ChargifyNET
             ChargeXML.AppendFormat("<memo>{0}</memo>", HttpUtility.HtmlEncode(memo));
             ChargeXML.AppendFormat("<delay_capture>{0}</delay_capture>", delayCharge ? "1" : "0");
             ChargeXML.AppendFormat("<use_negative_balance>{0}</use_negative_balance>", !useNegativeBalance ? "1" : "0");
+            ChargeXML.AppendFormat("<accrue_on_failure>{0}</accrue_on_failure>", accrueOnFailure ? "1" : "0");
             ChargeXML.Append("</charge>");
             // now make the request
             string response = this.DoRequest(string.Format("subscriptions/{0}/charges.{1}", SubscriptionID, GetMethodExtension()), HttpRequestMethod.Post, ChargeXML.ToString());
