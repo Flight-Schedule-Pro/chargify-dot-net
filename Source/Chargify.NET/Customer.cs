@@ -197,6 +197,9 @@ namespace ChargifyNET
                     case CustomerAttributes.EmailKey:
                         this.Email = dataNode.GetNodeContentAsString();
                         break;
+                    case CustomerAttributes.CcEmailKey:
+                        this.Cc_Emails = dataNode.GetNodeContentAsString();
+                        break;
                     case CustomerAttributes.PhoneKey:
                         this.Phone = dataNode.GetNodeContentAsString();
                         break;

@@ -613,6 +613,7 @@ namespace ChargifyNET
                 if (OldCust.ShippingState != Customer.ShippingState) { customerXml.AppendFormat("<state>{0}</state>", HttpUtility.HtmlEncode(Customer.ShippingState)); isUpdateRequired = true; }
                 if (OldCust.ShippingZip != Customer.ShippingZip) { customerXml.AppendFormat("<zip>{0}</zip>", Customer.ShippingZip); isUpdateRequired = true; }
                 if (OldCust.ShippingCountry != Customer.ShippingCountry) { customerXml.AppendFormat("<country>{0}</country>", HttpUtility.HtmlEncode(Customer.ShippingCountry)); isUpdateRequired = true; }
+                if (OldCust.Cc_Emails != Customer.Cc_Emails) { customerXml.AppendFormat("<cc_emails>{0}</cc_emails>", HttpUtility.HtmlEncode(Customer.Cc_Emails)); isUpdateRequired = true; }
             }
             customerXml.Append("</customer>");
 
