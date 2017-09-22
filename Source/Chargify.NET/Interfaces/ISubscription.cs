@@ -111,6 +111,8 @@ namespace ChargifyNET
         /// The 'parital' invoice state
         /// </summary>
         Partial,
+
+        On_Hold,
         /// <summary>
         /// The 'unknown' subscription state, only internal to this wrapper
         /// </summary>
