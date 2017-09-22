@@ -3760,7 +3760,8 @@ namespace ChargifyNET
             if (amount < 0) throw new ArgumentNullException("Amount"); // Chargify will throw a 422 if a negative number is in this field.
             if (string.IsNullOrEmpty(memo)) throw new ArgumentNullException("Memo");
             // make sure that the SubscriptionID is unique
-            if (this.LoadSubscription(SubscriptionID) == null) throw new ArgumentException("Not an SubscriptionID", "SubscriptionID");
+            var subscription = this.LoadSubscription(SubscriptionID);
+            if (subscription == null) throw new ArgumentException("Not an SubscriptionID", "SubscriptionID");
             // create XML for creation of a charge
             StringBuilder ChargeXML = new StringBuilder(GetXMLStringIfApplicable());
             ChargeXML.Append("<charge>");
@@ -3769,6 +3770,10 @@ namespace ChargifyNET
             ChargeXML.AppendFormat("<delay_capture>{0}</delay_capture>", delayCharge ? "1" : "0");
             ChargeXML.AppendFormat("<use_negative_balance>{0}</use_negative_balance>", !useNegativeBalance ? "1" : "0");
             ChargeXML.AppendFormat("<accrue_on_failure>{0}</accrue_on_failure>", accrueOnFailure ? "1" : "0");
+            if (subscription.PaymentCollectionMethod == PaymentCollectionMethod.Invoice)
+            {
+                ChargeXML.AppendFormat("<payment_collection_method>invoice</payment_collection_method>");
+            }
             ChargeXML.Append("</charge>");
             // now make the request
             string response = this.DoRequest(string.Format("subscriptions/{0}/charges.{1}", SubscriptionID, GetMethodExtension()), HttpRequestMethod.Post, ChargeXML.ToString());
