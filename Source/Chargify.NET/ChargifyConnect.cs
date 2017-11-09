@@ -1780,6 +1780,14 @@ namespace ChargifyNET
             return CreateSubscription(ProductHandle, SystemID, CouponCode);
         }
 
+        public ISubscription CreateSubscriptionUsingCoupon(string ProductHandle, string SystemID, string CouponCode, int PaymentProfileID)
+        {
+            // make sure data is valid            
+            if (SystemID == string.Empty) throw new ArgumentException("Invalid system customer ID detected", "ChargifyID");
+
+            return CreateSubscription(ProductHandle, SystemID, null, null, null, null, null, CouponCode, DateTime.MinValue, PaymentProfileID);
+        }
+
         /// <summary>
         /// Create a new subscription 
         /// </summary>
@@ -2595,11 +2603,14 @@ namespace ChargifyNET
         {
             // make sure data is valid
             if (string.IsNullOrEmpty(ProductHandle)) throw new ArgumentNullException("ProductHandle");
-            if (string.IsNullOrEmpty(FirstName)) throw new ArgumentNullException("FirstName");
-            if (string.IsNullOrEmpty(LastName)) throw new ArgumentNullException("LastName");
-            if (string.IsNullOrEmpty(EmailAddress)) throw new ArgumentNullException("EmailAddress");
 
             ICustomer existingCustomer = this.LoadCustomer(NewSystemID);
+            if (existingCustomer == null)
+            {
+                if (string.IsNullOrEmpty(FirstName)) throw new ArgumentNullException("FirstName");
+                if (string.IsNullOrEmpty(LastName)) throw new ArgumentNullException("LastName");
+                if (string.IsNullOrEmpty(EmailAddress)) throw new ArgumentNullException("EmailAddress");
+            }
             IProduct subscribingProduct = this.LoadProduct(ProductHandle);
             if (subscribingProduct == null) throw new ArgumentException("Product not found", "ProductHandle");
 
