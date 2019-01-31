@@ -68,6 +68,8 @@ namespace ChargifyNET
         private const string PaymentTypeKey = "payment_type";
         private const string CardTypeKey = "card_type";
         private const string MaskedCardNumberKey = "masked_card_number";
+        private const string MaskedBankRoutingNumberKey = "masked_bank_routing_number";
+        private const string MaskedBankAccountNumberKey = "masked_bank_account_number";
         #endregion
 
         #region Constructors
@@ -191,7 +193,12 @@ namespace ChargifyNET
                     case MaskedCardNumberKey:
                         _maskedCardNumber = dataNode.GetNodeContentAsString();
                         break;
-
+                    case MaskedBankRoutingNumberKey:
+                        _maskedBankRoutingNumber = dataNode.GetNodeContentAsString();
+                        break;
+                    case MaskedBankAccountNumberKey:
+                        _maskedBankAccountNumber = dataNode.GetNodeContentAsString();
+                        break;
                     default:
                         break;
                 }
@@ -275,6 +282,12 @@ namespace ChargifyNET
                         break;
                     case MaskedCardNumberKey:
                         _maskedCardNumber = obj.GetJSONContentAsString(key);
+                        break;
+                    case MaskedBankRoutingNumberKey:
+                        _maskedBankRoutingNumber = obj.GetJSONContentAsString(key);
+                        break;
+                    case MaskedBankAccountNumberKey:
+                        _maskedBankAccountNumber = obj.GetJSONContentAsString(key);
                         break;
                     default:
                         break;
