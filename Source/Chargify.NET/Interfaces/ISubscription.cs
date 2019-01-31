@@ -234,6 +234,10 @@ namespace ChargifyNET
         /// Get the coupon code currently applied (if applicable) to the subscription
         /// </summary>
         string CouponCode { get; }
+
+        int? CouponCodeUseCount { get; }
+
+        int? CouponCodeUsesAllowed { get; }
         /// <summary>
         /// The version of the product currently subscribed. NOTE: we have not exposed versions 
         /// (yet) elsewhere in the API, but if you change the price of your product the versions 

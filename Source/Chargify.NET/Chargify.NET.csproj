@@ -159,6 +159,9 @@
     <Compile Include="Json\XmlToJson.cs" />
     <Compile Include="Migration.cs" />
     <Compile Include="PaymentProfileAttributes.cs" />
+    <Compile Include="PricePoint.cs" />
+    <Compile Include="PricePointPrice.cs" />
+    <Compile Include="PricePointsContainer.cs" />
     <Compile Include="Product.cs" />
     <Compile Include="ProductFamily.cs" />
     <Compile Include="ProductFamilyAttributes.cs" />

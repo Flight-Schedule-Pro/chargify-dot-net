@@ -27,9 +27,9 @@
 //
 #endregion
 
+using Newtonsoft.Json;
 using System.Dynamic;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace ChargifyNET
 {
@@ -37,12 +37,12 @@ namespace ChargifyNET
     using ChargifyNET.Json;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Net;
     using System.Text;
     using System.Web;
     using System.Xml;
-    using System.Globalization;
     #endregion
 
     /// <summary>
@@ -3615,6 +3615,23 @@ namespace ChargifyNET
             }
         }
 
+        public ICoupon FindCoupon(string couponCode)
+        {
+            try
+            {
+                string response = this.DoRequest($"coupons/find.{GetMethodExtension()}?code={couponCode}");
+                // change the response to the object
+                return response.ConvertResponseTo<Coupon>("coupon");
+            }
+            catch (ChargifyException cex)
+            {
+                // Throw if anything but not found, since not found is telling us that it's working correctly
+                // but that there just isn't a coupon with that code.
+                if (cex.StatusCode == HttpStatusCode.NotFound) return null;
+                throw cex;
+            }
+        }
+
         /// <summary>
         /// Method to add a coupon to a subscription using the API
         /// </summary>
@@ -4418,6 +4435,21 @@ namespace ChargifyNET
 
             return null;
         }
+        #endregion
+
+        #region Component Price Points
+
+        public List<PricePoint> GetPricePointsForComponent(int componentId)
+        {
+            var useJson = this.UseJSON;
+            this.UseJSON = true;
+            var response = DoRequest($"components/{componentId}/price_points.json");
+            this.UseJSON = useJson;
+            var points = JsonConvert.DeserializeObject<PricePointsContainer>(response);
+
+            return points.PricePoints;
+        }
+
         #endregion
 
         #region Transactions

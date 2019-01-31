@@ -66,6 +66,8 @@ namespace ChargifyNET
         private const string SignupRevenueKey = "signup_revenue";
         private const string DelayedCancelAtKey = "delayed_cancel_at";
         private const string CouponCodeKey = "coupon_code";
+        private const string CouponCodeUseCountKey = "coupon_use_count";
+        private const string CouponCodeUsesAllowedKey = "coupon_uses_allowed";
         private const string TotalRevenueInCentsKey = "total_revenue_in_cents";
         private const string CustomerKey = "customer";
         private const string PaymentProfileAsCreditCardKey = "credit_card";
@@ -203,6 +205,12 @@ namespace ChargifyNET
                     case CouponCodeKey:
                         _couponCode = obj.GetJSONContentAsString(key);
                         break;
+                    case CouponCodeUseCountKey:
+                        _couponCodeUseCount = obj.GetJSONContentAsInt(key);
+                        break;
+                    case CouponCodeUsesAllowedKey:
+                        _couponCodeUsesAllowed = obj.GetJSONContentAsInt(key);
+                        break;
                     case ProductKey:
                         _product = obj.GetJSONContentAsProduct(key);
                         break;
@@ -305,6 +313,12 @@ namespace ChargifyNET
                         break;
                     case CouponCodeKey:
                         _couponCode = dataNode.GetNodeContentAsString();
+                        break;
+                    case CouponCodeUseCountKey:
+                        _couponCodeUseCount = dataNode.GetNodeContentAsNullableInt();
+                        break;
+                    case CouponCodeUsesAllowedKey:
+                        _couponCodeUsesAllowed = dataNode.GetNodeContentAsNullableInt();
                         break;
                     case ProductKey:
                         _product = dataNode.GetNodeContentAsProduct();
@@ -475,6 +489,18 @@ namespace ChargifyNET
             }
         }
         private string _couponCode = string.Empty;
+
+        public int? CouponCodeUseCount
+        {
+            get { return _couponCodeUseCount; }
+        }
+        private int? _couponCodeUseCount = null;
+
+        public int? CouponCodeUsesAllowed
+        {
+            get { return _couponCodeUsesAllowed; }    
+        }
+        private int? _couponCodeUsesAllowed = null;
 
         /// <summary>
         /// Timestamp relating to the start of the current (recurring) period
