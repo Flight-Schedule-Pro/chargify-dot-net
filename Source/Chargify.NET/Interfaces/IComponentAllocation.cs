@@ -99,7 +99,10 @@ namespace ChargifyNET
         /// No value (internal to this library)
         /// </summary>
         [XmlIgnore]
-        Unknown
+        Unknown,
+
+        [XmlEnum("full")]
+        Full
     }
 
     /// <summary>
