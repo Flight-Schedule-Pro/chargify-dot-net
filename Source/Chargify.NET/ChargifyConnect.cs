@@ -4362,6 +4362,7 @@ namespace ChargifyNET
 
         }
 
+        [Obsolete]
         public List<ComponentAllocation> CreateComponentAllocations(int subscriptionId, ComponentUpgradeProrationScheme upgradeScheme, ComponentDowngradeProrationScheme downgradeScheme, List<ComponentChange> componentChanges)
         {
            if (componentChanges == null || !componentChanges.Any()) throw new ArgumentNullException(nameof(componentChanges));
@@ -4399,6 +4400,47 @@ namespace ChargifyNET
                 }
             }
 
+            obj.allocations = new List<dynamic>();
+            foreach (var componentChange in componentChanges)
+            {
+                dynamic change = new ExpandoObject();
+                change.component_id = componentChange.ComponentId;
+                change.quantity = componentChange.Quantity;
+                change.memo = componentChange.Memo ?? string.Empty;
+                obj.allocations.Add(change);
+            }
+
+            var json = JsonConvert.SerializeObject(obj);
+
+            var rememberSetting = UseJSON;
+            UseJSON = true;
+            string response = DoRequest($"subscriptions/{subscriptionId}/allocations.json", HttpRequestMethod.Post, json);
+            UseJSON = rememberSetting;
+
+            return JsonConvert.DeserializeObject<List<ComponentAllocation>>(response);
+        }
+
+        public List<ComponentAllocation> CreateComponentAllocations(int subscriptionId, UpgradeChargeProrationScheme upgradeScheme, DowngradeChargeProrationScheme downgradeScheme, bool? accrueCharge, List<ComponentChange> componentChanges)
+        {
+           if (componentChanges == null || !componentChanges.Any()) throw new ArgumentNullException(nameof(componentChanges));
+
+            dynamic obj = new ExpandoObject();
+
+            if (upgradeScheme != UpgradeChargeProrationScheme.Unknown)
+            {
+                obj.upgrade_charge = Enum.GetName(typeof(UpgradeChargeProrationScheme), upgradeScheme).ToLowerInvariant();
+            }
+
+            if (downgradeScheme != DowngradeChargeProrationScheme.Unknown)
+            {
+                obj.downgrade_credit = Enum.GetName(typeof(DowngradeChargeProrationScheme), downgradeScheme).ToLowerInvariant();
+            }
+
+            if (accrueCharge.HasValue)
+            {
+                obj.accrue_charge = accrueCharge.ToString().ToLowerInvariant();
+            }
+            
             obj.allocations = new List<dynamic>();
             foreach (var componentChange in componentChanges)
             {

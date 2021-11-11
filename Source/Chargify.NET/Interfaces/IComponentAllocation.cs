@@ -105,6 +105,54 @@ namespace ChargifyNET
         Full
     }
 
+    public enum UpgradeChargeProrationScheme
+    {
+        /// <summary>
+        /// A charge is added for the full price of the component.
+        /// </summary>
+        [XmlEnum("full")]
+        Full,
+        /// <summary>
+        /// A charge is added for the prorated price of the component change.
+        /// </summary>
+        [XmlEnum("prorated")]
+        Prorated,
+        /// <summary>
+        /// No charge is added.
+        /// </summary>
+        [XmlEnum("none")]
+        None,
+        /// <summary>
+        /// No value (internal to this library)
+        /// </summary>
+        [XmlIgnore]
+        Unknown
+    }
+
+    public enum DowngradeChargeProrationScheme
+    {
+        /// <summary>
+        /// A full price credit is added for the amount owed.
+        /// </summary>
+        [XmlEnum("full")]
+        Full,
+        /// <summary>
+        /// A prorated credit is added for the amount owed.
+        /// </summary>
+        [XmlEnum("prorated")]
+        Prorated,
+        /// <summary>
+        /// No charge is added.
+        /// </summary>
+        [XmlEnum("none")]
+        None,
+        /// <summary>
+        /// No value (internal to this library)
+        /// </summary>
+        [XmlIgnore]
+        Unknown
+    }
+
     /// <summary>
     /// llocations describe a change to the allocated quantity for a particular Component (either Quantity-Based or On/Off) for a particular Subscription.
     /// </summary>
