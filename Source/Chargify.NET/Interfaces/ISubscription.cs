@@ -118,6 +118,9 @@ namespace ChargifyNET
         Partial,
 
         On_Hold,
+
+        Awaiting_Signup,
+
         /// <summary>
         /// The 'unknown' subscription state, only internal to this wrapper
         /// </summary>
